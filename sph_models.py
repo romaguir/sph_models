@@ -158,10 +158,3 @@ def radial_rms_function(sph_file,lmin,lmax):
    plt.imshow(rad_rms_func,cmap='jet')
    plt.colorbar()
    plt.show()
-      
-
-#radial_correlation_function('models/S40RTS.sph')
-#radial_correlation_function('models/S40RTS.sph',lmin=0,lmax=4)
-#radial_rms_function('models/S40RTS.sph',lmin=0,lmax=4)
-
-plot_tomo_map(sph_file='models/S40RTS.sph',depth=2800.0,vmin=-2.0,vmax=2.0,lmin=0,lmax=40)
