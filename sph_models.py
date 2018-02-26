@@ -203,4 +203,15 @@ def plot_slice(sph_file,lon0,lat0,lon1,lat1):
    #plt.imshow(dep_maps[-1],cmap='jet_r')
    #plt.show()
 
-plot_slice('models/S40RTS.sph',0,0,180,0)
+
+def find_min_max(sph_file):
+   dep_maps = []
+
+   depths = np.arange(50,2800,50)
+   lats = np.linspace(-90,90,82)
+   lons = np.linspace(0,360,164)
+
+   for depth in depths:
+      dep_maps.append(extract_dep_map(sph_file,depth))
+   model_vals = np.array(dep_maps)
+   return np.min(model_vals), np.max(model_vals)
