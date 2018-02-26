@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import numpy as np
 import pyshtools
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d,RegularGridInterpolator
 from copy import deepcopy
 
 n_splines = 21
@@ -114,14 +114,14 @@ def extract_dep_map(sph_file,depth,lmin=0,lmax=40):
    map_dv = 0.0
 
    for i,sph_spline in enumerate(sph_splines):
-      grid = sph_spline.expand()
+      grid = sph_spline.expand('DH2')
       map_dv += spl_vals[i] * grid.data
 
    return map_dv
 
 def radial_correlation_function(sph_file,lmin,lmax):
 
-   depths = np.arange(50,2800,20)
+   depths = np.arange(50,2800,10)
    maps_list = []
    for depth in depths:
       map_dv = extract_dep_map(sph_file,depth,lmin,lmax)
@@ -158,3 +158,49 @@ def radial_rms_function(sph_file,lmin,lmax):
    plt.imshow(rad_rms_func,cmap='jet')
    plt.colorbar()
    plt.show()
+
+def plot_slice(sph_file,lon0,lat0,lon1,lat1):
+   #sph_splines = read_sph(sph_file,lmin,lmax)
+   #spl_vals = find_spl_vals(depth)
+   dep_maps = []
+
+   depths = np.arange(50,2800,50)
+   lats = np.linspace(-90,90,82)
+   lons = np.linspace(0,360,164)
+
+   for depth in depths:
+      print depth
+      dep_maps.append(extract_dep_map(sph_file,depth))
+
+   points = (depths,lats,lons)
+   values = np.array(dep_maps)
+   rgi = RegularGridInterpolator(points=points,values=values)
+
+   lons_slice = np.linspace(lon0,lon1,100)
+   lats_slice = np.linspace(lat1,lat1,100)
+   sample_pts = []
+
+   for i in range(0,len(lons_slice)):
+      for j in range(0,len(lats_slice)):
+         for k in range(0,len(depths)):
+            sample_pts.append([depths[k],lats_slice[j],lons_slice[i]])
+
+   sample_vals = rgi(sample_pts)
+   print sample_vals
+   x = []
+   y = []
+   z = []
+   for i in range(0,len(sample_vals)):
+      ####THIS IS A TEST FOR A LONGITUDINAL SLICE
+      x.append(sample_pts[i][2])
+      y.append(sample_pts[i][0]) 
+      z.append(sample_vals[i])
+
+   plt.scatter(x,y,c=z,edgecolor='none',cmap='jet_r',vmin=-0.02,vmax=0.02)
+   plt.gca().invert_yaxis()
+   plt.show()
+
+   #plt.imshow(dep_maps[-1],cmap='jet_r')
+   #plt.show()
+
+plot_slice('models/S40RTS.sph',0,0,180,0)
