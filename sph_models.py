@@ -9,7 +9,7 @@ from copy import deepcopy
 
 n_splines = 21
 
-def read_splines(splines_dir='./splines'):
+def read_splines(splines_dir='/home/romaguir/sph_models/splines'):
 
    splines = []
    for i in range(1,n_splines+1):
@@ -159,7 +159,7 @@ def radial_rms_function(sph_file,lmin,lmax):
    plt.colorbar()
    plt.show()
 
-def plot_slice(sph_file,lon0,lat0,lon1,lat1):
+def plot_slice(sph_file,lon0,lat0,lon1,lat1,save_pts=False):
    #sph_splines = read_sph(sph_file,lmin,lmax)
    #spl_vals = find_spl_vals(depth)
    dep_maps = []
@@ -196,13 +196,24 @@ def plot_slice(sph_file,lon0,lat0,lon1,lat1):
       y.append(sample_pts[i][0]) 
       z.append(sample_vals[i])
 
-   plt.scatter(x,y,c=z,edgecolor='none',cmap='jet_r',vmin=-0.02,vmax=0.02)
-   plt.gca().invert_yaxis()
-   plt.show()
+   #NOTE, ONLY VALID FOR LONGITUDINAL SLICES!
+   if save_pts:
+      pts_file = open('tomo_pts.dat','w')
+      for i in range(0,len(sample_vals)):
+         z_here = sample_pts[i][0]
+         rad_here = 6371.0 - z_here
+         lon_here = sample_pts[i][2]
+         val_here = sample_vals[i]*100.0
+         pts_file.write('{} {} {}\n'.format(lon_here,rad_here,val_here))
 
-   #plt.imshow(dep_maps[-1],cmap='jet_r')
+   #plt.scatter(x,y,c=z,edgecolor='none',cmap='jet_r',vmin=-0.02,vmax=0.02)
+   #plt.gca().invert_yaxis()
    #plt.show()
 
+   a = np.reshape(z,((len(lons_slice)*len(lats_slice),len(depths)) ))
+   plt.imshow(a,aspect='auto',vmin=-0.02,vmax=0.02,cmap='jet_r')
+   plt.colorbar()
+   plt.show()
 
 def find_min_max(sph_file):
    dep_maps = []
