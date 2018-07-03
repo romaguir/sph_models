@@ -9,7 +9,7 @@ from copy import deepcopy
 
 n_splines = 21
 
-def read_splines(splines_dir='/home/romaguir/sph_models/splines'):
+def read_splines(splines_dir='./splines'):
 
    splines = []
    for i in range(1,n_splines+1):
@@ -115,9 +115,18 @@ def extract_dep_map(sph_file,depth,lmin=0,lmax=40):
 
    for i,sph_spline in enumerate(sph_splines):
       grid = sph_spline.expand('DH2')
+      print grid.info
       map_dv += spl_vals[i] * grid.data
 
    return map_dv
+
+def get_epixarr(sph_file,depth,pixel_width=1.0):
+   lon_start = pixel_width / 2.0
+   lat_start = -90 + (pixel_width / 2.0)
+   lons = np.arange(lon_start,360.0,pixel_width/2.0)
+   lats = np.arange(lat_start,90.0,pixel_width/2.0)
+   print lons,lats
+
 
 def radial_correlation_function(sph_file,lmin,lmax):
 
