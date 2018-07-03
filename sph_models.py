@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import numpy as np
 import pyshtools
+import fortranformat as ff
 from scipy.interpolate import interp1d,RegularGridInterpolator
 from copy import deepcopy
 
@@ -120,13 +121,34 @@ def extract_dep_map(sph_file,depth,lmin=0,lmax=40):
 
    return map_dv
 
-def get_epixarr(sph_file,depth,pixel_width=1.0):
+def write_epix(sph_file,depth,pixel_width,out_file,lmin=0,lmax=40):
+   #create list of points at which to get values
    lon_start = pixel_width / 2.0
    lat_start = -90 + (pixel_width / 2.0)
-   lons = np.arange(lon_start,360.0,pixel_width/2.0)
-   lats = np.arange(lat_start,90.0,pixel_width/2.0)
-   print lons,lats
+   lons = np.arange(lon_start,360.0,pixel_width)
+   lats = np.arange(lat_start,90.0,pixel_width)
+   lon_pts,lat_pts = np.meshgrid(lons,lats)
+   lats_flat = lat_pts.flatten(order='F')
+   lons_flat = lon_pts.flatten(order='F')
 
+   #find values at points
+   sph_splines = read_sph(sph_file,lmin,lmax)
+   spl_vals = find_spl_vals(depth)
+   dv_list = 0.0
+
+   for i,sph_spline in enumerate(sph_splines):
+      vals = sph_spline.expand(lat = lats_flat,
+                               lon = lons_flat)
+      dv_list += spl_vals[i] * vals * 100.0
+
+   fout = open(out_file,'w')
+   fout.write('#BASIS:PIX\n')
+
+   for i in range(0,len(dv_list)):
+      #fout.write('{:f6.3} {:f6.3} {:f1.3} {:10:10E}\n'.format(
+      fout.write('{} {} {} {}\n'.format(
+      lats_flat[i],lons_flat[i],pixel_width,dv_list[i]))
+   fout.close()
 
 def radial_correlation_function(sph_file,lmin,lmax):
 
