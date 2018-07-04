@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: sph-models
+Version: 0.1
+Summary: Package for handling global tomography models in sph (spherical harmonic)      parameterization of Ritsema et al. (2011)
+Home-page: www.github.com/romaguir/sph_tools
+Author: Ross Maguire
+Author-email: rmaguire@umd.edu
+License: GNU
+Description: UNKNOWN
+Platform: UNKNOWN
