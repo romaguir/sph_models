@@ -18,7 +18,6 @@ def read_splines(par='S40RTS'):
    '''
 
    if par=='S40RTS':
-      #splines_dir = sph_models.__path__+'sph_models/splines'
       splines_dir = path.join(path.dirname(__file__), 'splines')
 
    splines = []
@@ -106,16 +105,24 @@ def plot_tomo_map(sph_file,depth,vmin=-2.0,vmax=2.0,lmin=0,lmax=40):
    spl_vals = find_spl_vals(depth)
    map_dv = 0.0
 
+   fig = plt.figure(figsize=[8,5])
+   #tomo_map = plt.subplot(1,1,1,projection=ccrs.Mollweide(180))
+   tomo_map = plt.subplot(1,1,1,projection=ccrs.Mollweide(180))
+
    for i,sph_spline in enumerate(sph_splines):
       grid = sph_spline.expand()
       map_dv += spl_vals[i] * grid.data
 
    lons,lats = np.meshgrid(grid.lons(),grid.lats())
-   tomo_map = plt.axes(projection=ccrs.Mollweide(180))
-   tomo_map.pcolor(lons,lats,map_dv*100.0,
-                     transform=ccrs.PlateCarree(),
-                     cmap='jet_r',vmin=vmin,vmax=vmax)
+   #tomo_map.pcolor(lons,lats,map_dv*100.0,
+   #                transform=ccrs.PlateCarree(),
+   #                cmap='jet_r',vmin=vmin,vmax=vmax)
+   tomo_map.contourf(grid.lons(),grid.lats(),map_dv*100.0,
+                   60,transform=ccrs.Mollweide(180),
+                   cmap='jet_r')
+
    tomo_map.coastlines()
+
    plt.show()
 
 def extract_dep_map(sph_file,depth,lmin=0,lmax=40):
@@ -131,6 +138,7 @@ def extract_dep_map(sph_file,depth,lmin=0,lmax=40):
    return map_dv
 
 def write_epix(sph_file,depth,pixel_width,out_file,lmin=0,lmax=40):
+
    #create list of points at which to get values
    lon_start = pixel_width / 2.0
    lat_start = -90 + (pixel_width / 2.0)
@@ -150,6 +158,7 @@ def write_epix(sph_file,depth,pixel_width,out_file,lmin=0,lmax=40):
                                lon = lons_flat)
       dv_list += spl_vals[i] * vals * 100.0
 
+   #write file
    fout = open(out_file,'w')
    fout.write('#BASIS:PIX\n')
 
@@ -190,7 +199,6 @@ def radial_rms_function(sph_file,lmin,lmax):
       for j in range(0,len(depths)):
          a = np.ravel(maps_list[i]) / np.abs(np.max(maps_list[i]))
          b = np.ravel(maps_list[j]) / np.abs(np.max(maps_list[j]))
-         #resid = np.ravel(maps_list[i]) - np.ravel(maps_list[j])
          resid = a - b
          rms = np.sqrt(np.mean(resid**2))
          rad_rms_func[i,j] = rms
