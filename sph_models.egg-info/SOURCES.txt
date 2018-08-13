@@ -1,9 +1,0 @@
-README.md
-sph_models/__init__.py
-sph_models/sph.py
-sph_models.egg-info/PKG-INFO
-sph_models.egg-info/SOURCES.txt
-sph_models.egg-info/dependency_links.txt
-sph_models.egg-info/pbr.json
-sph_models.egg-info/requires.txt
-sph_models.egg-info/top_level.txt
