@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from setuptools import setup
+from setuptools import find_packages
 import numpy as np
 
 setup(name='sph_models',
@@ -9,6 +10,6 @@ setup(name='sph_models',
       author='Ross Maguire',
       author_email='rmaguire@umd.edu',
       url='www.github.com/romaguir/sph_tools',
-      packages=['sph_models'],
-      install_requires=['pyshtools','fortranformat','mayavi','cartopy'],
+      packages=find_packages(),
+      install_requires=['pyshtools','fortranformat','cartopy'],
       license='GNU')

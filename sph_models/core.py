@@ -18,7 +18,7 @@ def read_splines(par='S40RTS'):
    '''
 
    if par=='S40RTS':
-      splines_dir = path.join(path.dirname(__file__), 'splines')
+      splines_dir = path.join(path.dirname(__file__), '../data/splines')
 
    splines = []
    for i in range(1,n_splines+1):
@@ -100,13 +100,12 @@ def find_spl_vals(depth):
 
    return spl_vals 
 
-def plot_tomo_map(sph_file,depth,vmin=-2.0,vmax=2.0,lmin=0,lmax=40):
+def plot_tomo_map(sph_file,depth,vmin=-2.0,vmax=2.0,lmin=0,lmax=40,contour_levels=20):
    sph_splines = read_sph(sph_file,lmin,lmax)
    spl_vals = find_spl_vals(depth)
    map_dv = 0.0
 
    fig = plt.figure(figsize=[8,5])
-   #tomo_map = plt.subplot(1,1,1,projection=ccrs.Mollweide(180))
    tomo_map = plt.subplot(1,1,1,projection=ccrs.Mollweide(180))
 
    for i,sph_spline in enumerate(sph_splines):
@@ -114,15 +113,13 @@ def plot_tomo_map(sph_file,depth,vmin=-2.0,vmax=2.0,lmin=0,lmax=40):
       map_dv += spl_vals[i] * grid.data
 
    lons,lats = np.meshgrid(grid.lons(),grid.lats())
-   #tomo_map.pcolor(lons,lats,map_dv*100.0,
-   #                transform=ccrs.PlateCarree(),
-   #                cmap='jet_r',vmin=vmin,vmax=vmax)
-   tomo_map.contourf(grid.lons(),grid.lats(),map_dv*100.0,
-                   60,transform=ccrs.Mollweide(180),
-                   cmap='jet_r')
+   cf = tomo_map.pcolormesh(grid.lons(),grid.lats(),map_dv*100.0,
+                         transform=ccrs.PlateCarree(),
+                         cmap='jet_r',vmin=vmin,vmax=vmax)
 
-   tomo_map.coastlines()
-
+   tomo_map.coastlines(zorder=99)
+   plt.colorbar(cf,fraction=0.02, pad=0.02,label='$\delta$Vs (%)')
+   plt.title('depth = {} km, lmin = {}, lmax = {}'.format(depth,lmin,lmax))
    plt.show()
 
 def extract_dep_map(sph_file,depth,lmin=0,lmax=40):
@@ -188,6 +185,10 @@ def radial_correlation_function(sph_file,lmin,lmax):
 
 def radial_rms_function(sph_file,lmin,lmax):
 
+   '''
+   #this is experimental 
+   '''
+
    depths = np.arange(50,2800,10)
    maps_list = []
    for depth in depths:
@@ -208,8 +209,6 @@ def radial_rms_function(sph_file,lmin,lmax):
    plt.show()
 
 def plot_slice(sph_file,lon0,lat0,lon1,lat1,save_pts=False):
-   #sph_splines = read_sph(sph_file,lmin,lmax)
-   #spl_vals = find_spl_vals(depth)
    dep_maps = []
 
    depths = np.arange(50,2800,50)
