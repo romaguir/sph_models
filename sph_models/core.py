@@ -129,10 +129,11 @@ def extract_dep_map(sph_file,depth,lmin=0,lmax=40):
 
    for i,sph_spline in enumerate(sph_splines):
       grid = sph_spline.expand('DH2')
-      print grid.info
       map_dv += spl_vals[i] * grid.data
 
-   return map_dv
+   lons,lats = np.meshgrid(grid.lons(),grid.lats())
+
+   return lons,lats,map_dv
 
 def write_epix(sph_file,depth,pixel_width,out_file,lmin=0,lmax=40):
 
